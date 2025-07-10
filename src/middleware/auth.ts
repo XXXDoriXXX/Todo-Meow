@@ -3,8 +3,10 @@ import jwt from 'jsonwebtoken';
 import { Request, Response, NextFunction } from 'express';
 
 const JWT_SECRET =process.env.JWT_SECRET || 'MeowMeowMeow';
-
-export const authenticate = (req: Request, res: Response, next: NextFunction) => {
+export interface AuthenticatedRequest extends Request {
+    user?:any;
+}
+export const authenticate = (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
     const authHeader = req.headers.authorization;
     const token = authHeader && authHeader.split(' ')[1];
 
@@ -16,7 +18,7 @@ export const authenticate = (req: Request, res: Response, next: NextFunction) =>
         if(err){
             return res.status(403).json({ message: 'Forbidden' });
         }
-        req.body.user = decoded;
+        req.user = decoded;
 
         const start = Date.now();
         try{
@@ -33,7 +35,7 @@ export const authenticate = (req: Request, res: Response, next: NextFunction) =>
                 `\x1b[35m${req.originalUrl}\x1b[0m`, // magenta
                 `${statusColor}${res.statusCode}\x1b[0m`, // status color
                 `\x1b[34m${duration}ms\x1b[0m`, // blue
-                `\x1b[37m| User: ${req.body.user.username}\x1b[0m` // white
+                `\x1b[37m| User: ${req.user.username}\x1b[0m` // white
             ].join(' ');
 
             console.log(logMessage);
