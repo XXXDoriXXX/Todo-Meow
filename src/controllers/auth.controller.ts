@@ -3,10 +3,22 @@ import * as authService from '../services/auth.service';
 import prisma from "../prisma";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
-export const getCurrentUser = async (req:Request, res:Response) => {
-    const user = await authService.getUserById(req.body.user!.id);
-    return res.json(user);
-}
+import {AuthenticatedRequest} from "../middleware/auth";
+export const getCurrentUser = async (req: AuthenticatedRequest, res: Response) => {
+    const userId = req.user?.userId;
+    console.log('Current user ID:', userId);
+    if (!userId) {
+        return res.status(401).json({ message: 'Unauthorized' });
+    }
+
+    try {
+        const user = await authService.getUserById(userId);
+        return res.status(200).json(user);
+    } catch (err) {
+        console.error('Error getting user:', err);
+        return res.status(500).json({ message: 'Internal Server Error' });
+    }
+};
 export const signUp = async (req: Request, res: Response) => {
     const {username, password} = req.body;
     if (!username || !password) {

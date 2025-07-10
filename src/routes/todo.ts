@@ -2,13 +2,14 @@ import { Router } from 'express';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import prisma from '../prisma';
-import {getCurrentUser, login, signUp} from "../controllers/auth.controller";
 import {authenticate} from "../middleware/auth";
+import {createTodo, deleteTodo, getTodoById, getTodos, updateTodo} from "../controllers/todo.controller";
 
 const router = Router();
 
-router.post('/',  signUp);
-router.get('/', authenticate, getCurrentUser);
-router.put('/:id', authenticate, signUp);
-router.delete('/:id', authenticate, signUp);
+router.post('/',authenticate,createTodo);
+router.get('/', authenticate, getTodos);
+router.get('/:id', authenticate, getTodoById)
+router.put('/:id', authenticate,updateTodo );
+router.delete('/:id', authenticate,deleteTodo );
 export default router;
